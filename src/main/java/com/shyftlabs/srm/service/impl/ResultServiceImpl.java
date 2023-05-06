@@ -10,7 +10,8 @@ import com.shyftlabs.srm.entities.Course;
 import com.shyftlabs.srm.entities.Result;
 import com.shyftlabs.srm.entities.Student;
 import com.shyftlabs.srm.exception.CourseNotExistsException;
-import com.shyftlabs.srm.exception.ServiceCheckedException;
+import com.shyftlabs.srm.exception.DuplicateResultException;
+import com.shyftlabs.srm.exception.ServiceBaseException;
 import com.shyftlabs.srm.exception.StudentNotExistsException;
 import com.shyftlabs.srm.model.CourseDTO;
 import com.shyftlabs.srm.model.ResultDTO;
@@ -39,13 +40,19 @@ public class ResultServiceImpl extends BaseService implements IResultService {
 	private StudentRepository studentRepository;
 
 	@Override
-	public ResultDTO addResult(AddResultRequest request) throws ServiceCheckedException {
+	public ResultDTO addResult(AddResultRequest request) throws ServiceBaseException {
 		Course course = courseRepository.findById(request.getCourseId()).orElseThrow(() -> new CourseNotExistsException(
 				String.format("Course with id : {} not present", request.getCourseId())));
 
 		Student student = studentRepository.findById(request.getStudentId())
 				.orElseThrow(() -> new StudentNotExistsException(
 						String.format("Student with id : {} not present", request.getStudentId())));
+
+		if (resultRepository.existsByCourseIdAndStudentId(request.getCourseId(), request.getStudentId())) {
+			throw new DuplicateResultException(
+					String.format("Result for combination student : {} & course : {} already exists",
+							request.getStudentId(), request.getCourseId()));
+		}
 
 		Result result = MapperUtils.mapObject(request, Result.class);
 		result.setStudent(student);

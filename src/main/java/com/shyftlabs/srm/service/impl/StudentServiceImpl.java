@@ -6,7 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.shyftlabs.srm.entities.Student;
-import com.shyftlabs.srm.exception.ServiceCheckedException;
+import com.shyftlabs.srm.exception.DuplicateStudentException;
+import com.shyftlabs.srm.exception.ServiceBaseException;
 import com.shyftlabs.srm.exception.StudentNotExistsException;
 import com.shyftlabs.srm.model.StudentDTO;
 import com.shyftlabs.srm.repository.StudentRepository;
@@ -25,7 +26,12 @@ public class StudentServiceImpl extends BaseService implements IStudentService {
 	private StudentRepository studentRepository;
 
 	@Override
-	public StudentDTO addStudent(AddStudentRequest request) throws ServiceCheckedException {
+	public StudentDTO addStudent(AddStudentRequest request) throws ServiceBaseException {
+		if (studentRepository.existsByEmail(request.getEmail())) {
+			throw new DuplicateStudentException(
+					String.format("Student with email : {} already exists", request.getEmail()));
+		}
+		
 		Student student = MapperUtils.mapObject(request, Student.class);
 		log.info("Adding student : {}", student);
 		student = studentRepository.save(student);
@@ -41,7 +47,7 @@ public class StudentServiceImpl extends BaseService implements IStudentService {
 	}
 
 	@Override
-	public void deleteStudent(Long studentId) throws ServiceCheckedException {
+	public void deleteStudent(Long studentId) throws ServiceBaseException {
 		Student student = studentRepository.findById(studentId).orElseThrow(
 				() -> new StudentNotExistsException(String.format("Student with id : {} not present", studentId)));
 

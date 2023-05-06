@@ -7,7 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.shyftlabs.srm.entities.Course;
 import com.shyftlabs.srm.exception.CourseNotExistsException;
-import com.shyftlabs.srm.exception.ServiceCheckedException;
+import com.shyftlabs.srm.exception.DuplicateCourseException;
+import com.shyftlabs.srm.exception.ServiceBaseException;
 import com.shyftlabs.srm.model.CourseDTO;
 import com.shyftlabs.srm.repository.CourseRepository;
 import com.shyftlabs.srm.request.AddCourseRequest;
@@ -25,7 +26,12 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
 	private CourseRepository courseRepository;
 
 	@Override
-	public CourseDTO addCourse(AddCourseRequest request) throws ServiceCheckedException {
+	public CourseDTO addCourse(AddCourseRequest request) throws ServiceBaseException {
+		if (courseRepository.existsByName(request.getCourseName())) {
+			throw new DuplicateCourseException(
+					String.format("Course with name : {} already exists", request.getCourseName()));
+		}
+
 		Course course = MapperUtils.mapObject(request, Course.class);
 		log.info("Adding course : {}", course);
 		course = courseRepository.save(course);
@@ -41,7 +47,7 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
 	}
 
 	@Override
-	public void deleteCourse(Long courseId) throws ServiceCheckedException {
+	public void deleteCourse(Long courseId) throws ServiceBaseException {
 		Course course = courseRepository.findById(courseId).orElseThrow(
 				() -> new CourseNotExistsException(String.format("Course with id : {} not present", courseId)));
 
