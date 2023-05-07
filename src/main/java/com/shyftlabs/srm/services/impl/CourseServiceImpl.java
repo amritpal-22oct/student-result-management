@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.shyftlabs.srm.entities.Course;
+import com.shyftlabs.srm.enums.ErrorCode;
 import com.shyftlabs.srm.exceptions.CourseNotExistsException;
 import com.shyftlabs.srm.exceptions.DuplicateCourseException;
 import com.shyftlabs.srm.exceptions.ServiceBaseException;
@@ -14,7 +15,6 @@ import com.shyftlabs.srm.repositories.CourseRepository;
 import com.shyftlabs.srm.request.AddCourseRequest;
 import com.shyftlabs.srm.services.BaseService;
 import com.shyftlabs.srm.services.ICourseService;
-import com.shyftlabs.srm.util.ConstantsUtil.ErrorCodes;
 import com.shyftlabs.srm.util.MapperUtils;
 
 import lombok.extern.log4j.Log4j2;
@@ -29,8 +29,7 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
 	@Override
 	public CourseDTO addCourse(AddCourseRequest request) throws ServiceBaseException {
 		if (courseRepository.existsByName(request.getName())) {
-			throw new DuplicateCourseException(ErrorCodes.COURSE_DUPLICATE_NAME,
-					String.format("Course with name : %s already exists", request.getName()));
+			throw new DuplicateCourseException(ErrorCode.COURSE_DUPLICATE_NAME);
 		}
 
 		Course course = MapperUtils.mapObject(request, Course.class);
@@ -50,8 +49,7 @@ public class CourseServiceImpl extends BaseService implements ICourseService {
 	@Override
 	public void deleteCourse(Long courseId) throws ServiceBaseException {
 		Course course = courseRepository.findById(courseId)
-				.orElseThrow(() -> new CourseNotExistsException(ErrorCodes.COURSE_NOT_EXISTS_WITH_ID,
-						String.format("Course with id : %d not present", courseId)));
+				.orElseThrow(() -> new CourseNotExistsException(ErrorCode.COURSE_NOT_EXISTS_WITH_ID));
 
 		log.info("Going to delete course : {}", courseId);
 		courseRepository.delete(course);

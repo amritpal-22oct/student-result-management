@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.shyftlabs.srm.entities.Course;
 import com.shyftlabs.srm.entities.Result;
 import com.shyftlabs.srm.entities.Student;
+import com.shyftlabs.srm.enums.ErrorCode;
 import com.shyftlabs.srm.exceptions.CourseNotExistsException;
 import com.shyftlabs.srm.exceptions.DuplicateResultException;
 import com.shyftlabs.srm.exceptions.ServiceBaseException;
@@ -22,7 +23,6 @@ import com.shyftlabs.srm.repositories.StudentRepository;
 import com.shyftlabs.srm.request.AddResultRequest;
 import com.shyftlabs.srm.services.BaseService;
 import com.shyftlabs.srm.services.IResultService;
-import com.shyftlabs.srm.util.ConstantsUtil.ErrorCodes;
 import com.shyftlabs.srm.util.MapperUtils;
 
 import lombok.extern.log4j.Log4j2;
@@ -43,17 +43,13 @@ public class ResultServiceImpl extends BaseService implements IResultService {
 	@Override
 	public ResultDTO addResult(AddResultRequest request) throws ServiceBaseException {
 		Course course = courseRepository.findById(request.getCourseId())
-				.orElseThrow(() -> new CourseNotExistsException(ErrorCodes.COURSE_NOT_EXISTS_WITH_ID,
-						String.format("Course with id : %d not present", request.getCourseId())));
+				.orElseThrow(() -> new CourseNotExistsException(ErrorCode.COURSE_NOT_EXISTS_WITH_ID));
 
 		Student student = studentRepository.findById(request.getStudentId())
-				.orElseThrow(() -> new StudentNotExistsException(ErrorCodes.STUDENT_NOT_EXISTS_WITH_ID,
-						String.format("Student with id : %d not present", request.getStudentId())));
+				.orElseThrow(() -> new StudentNotExistsException(ErrorCode.STUDENT_NOT_EXISTS_WITH_ID));
 
 		if (resultRepository.existsByCourseIdAndStudentId(request.getCourseId(), request.getStudentId())) {
-			throw new DuplicateResultException(ErrorCodes.RESULT_DUPLICATE_STUDENT_AND_COURSE,
-					String.format("Result for combination of student : %d & course : %d already exists",
-							request.getStudentId(), request.getCourseId()));
+			throw new DuplicateResultException(ErrorCode.RESULT_DUPLICATE_STUDENT_AND_COURSE);
 		}
 
 		Result result = MapperUtils.mapObject(request, Result.class);

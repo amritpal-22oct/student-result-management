@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.shyftlabs.srm.enums.ErrorCode;
 import com.shyftlabs.srm.exceptions.CourseNotExistsException;
 import com.shyftlabs.srm.exceptions.DuplicateCourseException;
 import com.shyftlabs.srm.exceptions.DuplicateResultException;
@@ -15,7 +16,6 @@ import com.shyftlabs.srm.exceptions.DuplicateStudentException;
 import com.shyftlabs.srm.exceptions.ServiceBaseException;
 import com.shyftlabs.srm.exceptions.StudentNotExistsException;
 import com.shyftlabs.srm.responses.ErrorResponse;
-import com.shyftlabs.srm.util.ConstantsUtil.ErrorCodes;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -25,9 +25,11 @@ public class ControllerAdvice {
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException exception) {
+		ErrorCode errorCode = ErrorCode.REQUEST_VALIDATION_FAILURE;
+
 		log.error("Request validation error : {}", exception.getMessage());
-		ErrorResponse errorResponse = new ErrorResponse(ErrorCodes.REQUEST_VALIDATION_FAILURE,
-				"Validation error. Details in 'error' field.");
+
+		ErrorResponse errorResponse = new ErrorResponse(errorCode.getErrorCode(), errorCode.getErrorMessage());
 
 		for (FieldError fieldError : exception.getBindingResult().getFieldErrors()) {
 			errorResponse.addValidationError(fieldError.getField(), fieldError.getDefaultMessage());
@@ -37,32 +39,38 @@ public class ControllerAdvice {
 
 	@ExceptionHandler({ CourseNotExistsException.class, StudentNotExistsException.class })
 	public ResponseEntity<ErrorResponse> handleNotExistsExceptions(ServiceBaseException exception) {
-		log.error("Exception : {}", exception.getMessage());
-		ErrorResponse errorResponse = new ErrorResponse(exception.getErrorCode(), exception.getMessage());
+		ErrorCode errorCode = exception.getErrorCode();
+
+		log.error("Exception : {}", errorCode.getErrorMessage());
+		ErrorResponse errorResponse = new ErrorResponse(errorCode.getErrorCode(), errorCode.getErrorMessage());
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
 	}
 
 	@ExceptionHandler({ DuplicateCourseException.class, DuplicateStudentException.class,
 			DuplicateResultException.class })
 	public ResponseEntity<ErrorResponse> handleDuplicateEntityExceptions(ServiceBaseException exception) {
-		log.error("Exception : {}", exception.getMessage());
-		ErrorResponse errorResponse = new ErrorResponse(exception.getErrorCode(), exception.getMessage());
+		ErrorCode errorCode = exception.getErrorCode();
+
+		log.error("Exception : {}", errorCode.getErrorMessage());
+		ErrorResponse errorResponse = new ErrorResponse(errorCode.getErrorCode(), errorCode.getErrorMessage());
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
 	}
 
 	@ExceptionHandler(OptimisticEntityLockException.class)
 	public ResponseEntity<ErrorResponse> handleOptimisticLockFailure(OptimisticEntityLockException exception) {
+		ErrorCode errorCode = ErrorCode.OPTIMISTIC_FAILURE;
+
 		log.error("Optimistic lock failure ", exception);
-		ErrorResponse errorResponse = new ErrorResponse(ErrorCodes.OPTIMISTIC_FAILURE,
-				"Some error occured. Please try again.");
+		ErrorResponse errorResponse = new ErrorResponse(errorCode.getErrorCode(), errorCode.getErrorMessage());
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
 	}
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorResponse> handleUncaughtExceptions(Exception exception) {
+		ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+
 		log.error("Unknown error occurred ", exception);
-		ErrorResponse errorResponse = new ErrorResponse(ErrorCodes.INTERNAL_SERVER_ERROR,
-				"Some error occured. Please try again.");
+		ErrorResponse errorResponse = new ErrorResponse(errorCode.getErrorCode(), errorCode.getErrorMessage());
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 
 	}
