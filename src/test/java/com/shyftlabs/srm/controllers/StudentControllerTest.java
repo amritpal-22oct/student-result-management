@@ -44,11 +44,11 @@ public class StudentControllerTest {
 
 	private static final String STUDENTS_API_ENDPOINT = "/students";
 
-	StudentDTO STUDENT_1 = new StudentDTO(1L, "Test1", "User", "test1@gmail.com",
+	private StudentDTO STUDENT_1 = new StudentDTO(1L, "Test1", "User", "test1@gmail.com",
 			Date.valueOf(LocalDate.of(2010, Month.JANUARY, 1)));
-	StudentDTO STUDENT_2 = new StudentDTO(1L, "Test2", "User", "test2@gmail.com",
+	private StudentDTO STUDENT_2 = new StudentDTO(2L, "Test2", "User", "test2@gmail.com",
 			Date.valueOf(LocalDate.of(2010, Month.JANUARY, 1)));
-	StudentDTO STUDENT_3 = new StudentDTO(1L, "Test3", "User", "test3@gmail.com",
+	private StudentDTO STUDENT_3 = new StudentDTO(3L, "Test3", "User", "test3@gmail.com",
 			Date.valueOf(LocalDate.of(2010, Month.JANUARY, 1)));
 
 	@Test
