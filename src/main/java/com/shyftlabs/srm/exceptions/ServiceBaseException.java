@@ -13,6 +13,7 @@ public class ServiceBaseException extends RuntimeException {
 
 	public ServiceBaseException(ErrorCode errorCode) {
 		super(errorCode.getErrorMessage());
+		this.errorCode = errorCode;
 	}
 
 	public ErrorCode getErrorCode() {

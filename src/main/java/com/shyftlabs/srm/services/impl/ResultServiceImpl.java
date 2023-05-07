@@ -42,15 +42,16 @@ public class ResultServiceImpl extends BaseService implements IResultService {
 
 	@Override
 	public ResultDTO addResult(AddResultRequest request) throws ServiceBaseException {
+		
+		if (resultRepository.existsByCourseIdAndStudentId(request.getCourseId(), request.getStudentId())) {
+			throw new DuplicateResultException(ErrorCode.RESULT_DUPLICATE_STUDENT_AND_COURSE);
+		}
+		
 		Course course = courseRepository.findById(request.getCourseId())
 				.orElseThrow(() -> new CourseNotExistsException(ErrorCode.COURSE_NOT_EXISTS_WITH_ID));
 
 		Student student = studentRepository.findById(request.getStudentId())
 				.orElseThrow(() -> new StudentNotExistsException(ErrorCode.STUDENT_NOT_EXISTS_WITH_ID));
-
-		if (resultRepository.existsByCourseIdAndStudentId(request.getCourseId(), request.getStudentId())) {
-			throw new DuplicateResultException(ErrorCode.RESULT_DUPLICATE_STUDENT_AND_COURSE);
-		}
 
 		Result result = MapperUtils.mapObject(request, Result.class);
 		result.setStudent(student);
