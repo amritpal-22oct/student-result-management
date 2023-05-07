@@ -16,6 +16,7 @@ import com.shyftlabs.srm.models.CourseDTO;
 import com.shyftlabs.srm.request.AddCourseRequest;
 import com.shyftlabs.srm.services.ICourseService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
 @RestController
@@ -24,6 +25,7 @@ public class CourseController {
 	@Autowired
 	private ICourseService courseService;
 
+	@Operation(summary = "Add Course")
 	@PostMapping("/courses")
 	public ResponseEntity<CourseDTO> addCourse(@Valid @RequestBody AddCourseRequest request) {
 		return ResponseEntity
@@ -31,6 +33,7 @@ public class CourseController {
 		        .body(courseService.addCourse(request));
 	}
 
+	@Operation(summary = "Get all Courses")
 	@GetMapping("/courses")
 	ResponseEntity<List<CourseDTO>> getAllCourses() {
 		return ResponseEntity
@@ -38,6 +41,7 @@ public class CourseController {
 		        .body(courseService.getAllCourses());
 	}
 
+	@Operation(summary = "Delete Course")
 	@DeleteMapping("/courses/{id}")
 	ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
 		courseService.deleteCourse(id);

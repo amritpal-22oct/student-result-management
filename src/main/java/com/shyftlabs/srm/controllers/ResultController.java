@@ -14,6 +14,7 @@ import com.shyftlabs.srm.models.ResultDTO;
 import com.shyftlabs.srm.request.AddResultRequest;
 import com.shyftlabs.srm.services.IResultService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
 @RestController
@@ -22,6 +23,7 @@ public class ResultController {
 	@Autowired
 	private IResultService resultService;
 	
+	@Operation(summary = "Add Result")
 	@PostMapping("/results")
 	public ResponseEntity<ResultDTO> addCourse(@Valid @RequestBody AddResultRequest request) {
 		return ResponseEntity
@@ -29,6 +31,7 @@ public class ResultController {
 		        .body(resultService.addResult(request));
 	}
 
+	@Operation(summary = "Get all Results")
 	@GetMapping("/results")
 	public ResponseEntity<List<ResultDTO>> getAllResults() {
 		return ResponseEntity

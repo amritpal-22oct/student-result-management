@@ -16,6 +16,7 @@ import com.shyftlabs.srm.models.StudentDTO;
 import com.shyftlabs.srm.request.AddStudentRequest;
 import com.shyftlabs.srm.services.IStudentService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
 @RestController
@@ -24,16 +25,19 @@ public class StudentController {
 	@Autowired
 	private IStudentService studentService;
 
+	@Operation(summary = "Add Student")
 	@PostMapping("/students")
 	public ResponseEntity<StudentDTO> addStudent(@Valid @RequestBody AddStudentRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(studentService.addStudent(request));
 	}
 
+	@Operation(summary = "Get all Students")
 	@GetMapping("/students")
 	ResponseEntity<List<StudentDTO>> getAllStudents() {
 		return ResponseEntity.status(HttpStatus.OK).body(studentService.getAllStudents());
 	}
 
+	@Operation(summary = "Delete Student")
 	@DeleteMapping("/students/{id}")
 	ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
 		studentService.deleteStudent(id);
