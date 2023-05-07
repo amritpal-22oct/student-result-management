@@ -12,6 +12,6 @@ public class AddCourseRequest {
 
 	@NotBlank(message = "Course cannot be blank")
 	@Size(max = 128, message = "Course name cannot be longer than 128 characters")
-	private String courseName;
+	private String name;
 
 }

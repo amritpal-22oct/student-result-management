@@ -1,10 +1,12 @@
 package com.shyftlabs.srm.entities;
 
-import org.springframework.data.annotation.Id;
+import com.shyftlabs.srm.enums.Score;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -17,11 +19,11 @@ import lombok.Data;
 public class Result {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
 	@Column(name = "score")
-	private String score;
+	private Score score;
 	
 	@ManyToOne
 	@JoinColumn(name = "student_id")

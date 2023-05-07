@@ -1,21 +1,25 @@
 package com.shyftlabs.srm.entities;
 
-import java.sql.Date;
-
-import org.springframework.data.annotation.Id;
+import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import jakarta.persistence.Version;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "student")
 public class Student {
 	
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
 	@Column(name = "first_name")
@@ -28,6 +32,7 @@ public class Student {
 	private String email;
 	
 	@Column(name = "date_of_birth")
+	@Temporal(TemporalType.DATE)
 	private Date dateOfBirth;
 	
 	@Version
